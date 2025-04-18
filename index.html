@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Quiz Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        
+        /* Registration form styles */
+        #registration-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        /* Button styles */
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        /* Quiz styles */
+        #quiz-container {
+            display: none;
+        }
+        
+        .question-container {
+            margin-bottom: 20px;
+        }
+        
+        .question {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .option {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .option:hover {
+            background-color: #e9ecef;
+        }
+        
+        .option.selected {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+        
+        .quiz-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        /* Results styles */
+        #results-container {
+            display: none;
+            text-align: center;
+        }
+        
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .user-info {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .certificate {
+            border: 2px solid #3498db;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            background-color: #f9f9f9;
+        }
+        
+        .certificate h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        /* Welcome screen */
+        #welcome-screen {
+            text-align: center;
+            display: none;
+        }
+        
+        .welcome-message {
+            font-size: 20px;
+            margin: 20px 0;
+        }
+        
+        .timer {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Car Enthusiast Quiz</h1>
+            <p>Test your knowledge about cars and become a certified car enthusiast!</p>
+        </header>
+        
+        <!-- Registration Form -->
+        <div id="registration-form-container" class="card fade-in">
+            <h2>Register to Start</h2>
+            <form id="registration-form">
+                <div class="form-group">
+                    <label for="username">Full Name</label>
+                    <input type="text" id="username" name="username" required>
+                    <span class="error" id="username-error">Please enter your name</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" name="age" min="12" max="120" required>
+                    <span class="error" id="age-error">Please enter a valid age (12-120)</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                    <span class="error" id="email-error">Please enter a valid email address</span>
+                </div>
+                
+                <button type="submit" class="btn">Register & Start Quiz</button>
+            </form>
+        </div>
+        
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="card fade-in">
+            <h2>Welcome to the Car Quiz!</h2>
+            <div class="welcome-message">Hello <span id="user-name-display"></span>! Get ready to test your car knowledge.</div>
+            <p>Your quiz will begin in <span id="countdown">5</span> seconds...</p>
+            <div class="user-info">
+                <p>Name: <span id="display-name"></span></p>
+                <p>Age: <span id="display-age"></span></p>
+                <p>Email: <span id="display-email"></span></p>
+            </div>
+        </div>
+        
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="card fade-in">
+            <div class="progress-container">
+                <div class="progress-bar" id="progress"></div>
+            </div>
+            
+            <div class="question-container">
+                <div class="question" id="question-text">Question text will go here</div>
+                <div class="options" id="options-container">
+                    <!-- Options will be inserted here -->
+                </div>
+            </div>
+            
+            <div class="quiz-footer">
+                <span id="question-number">Question 1 of 10</span>
+                <button class="btn" id="next-btn">Next Question</button>
+            </div>
+        </div>
+        
+        <!-- Results Container -->
+        <div id="results-container" class="card fade-in">
+            <h2>Quiz Completed!</h2>
+            <div class="score">Your score: <span id="score">0</span>/10</div>
+            
+            <div class="certificate">
+                <h2>Certificate of Completion</h2>
+                <p>This certifies that</p>
+                <h3 id="certificate-name">Your Name</h3>
+                <p>has completed the Car Enthusiast Quiz with a score of</p>
+                <h3 id="certificate-score">0/10</h3>
+                <p>Date: <span id="certificate-date"></span></p>
+            </div>
+            
+            <button class="btn" id="restart-btn" style="margin-top: 20px;">Take Quiz Again</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const registrationFormContainer = document.getElementById('registration-form-container');
+        const registrationForm = document.getElementById('registration-form');
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultsContainer = document.getElementById('results-container');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const nextBtn = document.getElementById('next-btn');
+        const questionNumberDisplay = document.getElementById('question-number');
+        const progressBar = document.getElementById('progress');
+        const scoreDisplay = document.getElementById('score');
+        const certificateNameDisplay = document.getElementById('certificate-name');
+        const certificateScoreDisplay = document.getElementById('certificate-score');
+        const certificateDateDisplay = document.getElementById('certificate-date');
+        const restartBtn = document.getElementById('restart-btn');
+        const countdownElement = document.getElementById('countdown');
+        
+        // User information displays
+        const userNameDisplay = document.getElementById('user-name-display');
+        const displayName = document.getElementById('display-name');
+        const displayAge = document.getElementById('display-age');
+        const displayEmail = document.getElementById('display-email');
+
+        // Quiz Questions
+        const questions = [
+            {
+                question: "Which company manufactures the 'Mustang'?",
+                options: ["Chevrolet", "Ford", "Dodge", "Toyota"],
+                answer: 1
+            },
+            {
+                question: "What does BMW stand for?",
+                options: ["British Motor Works", "Bavarian Motor Works", "Berlin Motor Works", "Belgian Motor Works"],
+                answer: 1
+            },
+            {
+                question: "Which car is often referred to as the first 'muscle car'?",
+                options: ["Ford Mustang", "Chevrolet Camaro", "Pontiac GTO", "Dodge Charger"],
+                answer: 2
+            },
+            {
+                question: "Which country is home to the car manufacturer Ferrari?",
+                options: ["Germany", "France", "Italy", "United Kingdom"],
+                answer: 2
+            },
+            {
+                question: "What does the 'GT' in 'GT car' traditionally stand for?",
+                options: ["Grand Touring", "Great Technology", "German Tuned", "Grand Tested"],
+                answer: 0
+            },
+            {
+                question: "Which car manufacturer produces the 'Civic'?",
+                options: ["Toyota", "Honda", "Nissan", "Mazda"],
+                answer: 1
+            },
+            {
+                question: "What's typically measured in 'cc' in cars?",
+                options: ["Fuel capacity", "Engine displacement", "Tire pressure", "Oil viscosity"],
+                answer: 1
+            },
+            {
+                question: "Which luxury car has a 'Spirit of Ecstasy' hood ornament?",
+                options: ["Bentley", "Mercedes-Benz", "Rolls-Royce", "Jaguar"],
+                answer: 2
+            },
+            {
+                question: "In which decade was the first mass-produced Ford Model T introduced?",
+                options: ["1890s", "1900s", "1910s", "1920s"],
+                answer: 1
+            },
+            {
+                question: "Which car manufacturer's logo features four rings?",
+                options: ["BMW", "Audi", "Mercedes-Benz", "Volkswagen"],
+                answer: 1
+            }
+        ];
+
+        // Quiz state
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedOptionIndex = null;
+        let userInfo = {};
+
+        // Event Listeners
+        registrationForm.addEventListener('submit', handleRegistration);
+        nextBtn.addEventListener('click', handleNextQuestion);
+        restartBtn.addEventListener('click', restartQuiz);
+
+        // Form validation and registration
+        function handleRegistration(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const age = parseInt(document.getElementById('age').value);
+            const email = document.getElementById('email').value.trim();
+            
+            let isValid = true;
+            
+            // Validate username
+            if (!username) {
+                document.getElementById('username-error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('username-error').style.display = 'none';
+            }
+            
+            // Validate age
+            if (isNaN(age) || age < 12 || age > 120) {
+                document.getElementById('age-error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('age-error').style.display = 'none';
+            }
+            
+            // Validate email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email || !emailRegex.test(email)) {
+                document.getElementById('email-error').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('email-error').style.display = 'none';
+            }
+            
+            if (isValid) {
+                // Store user info
+                userInfo = {
+                    name: username,
+                    age: age,
+                    email: email
+                };
+                
+                // Update welcome screen
+                userNameDisplay.textContent = username;
+                displayName.textContent = username;
+                displayAge.textContent = age;
+                displayEmail.textContent = email;
+                
+                // Hide registration and show welcome screen
+                registrationFormContainer.style.display = 'none';
+                welcomeScreen.style.display = 'block';
+                
+                // Start countdown
+                let countdown = 5;
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    countdownElement.textContent = countdown;
+                    
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        startQuiz();
+                    }
+                }, 1000);
+            }
+        }
+
+        // Start the quiz
+        function startQuiz() {
+            welcomeScreen.style.display = 'none';
+            quizContainer.style.display = 'block';
+            loadQuestion();
+        }
+
+        // Load current question
+        function loadQuestion() {
+            const question = questions[currentQuestionIndex];
+            questionText.textContent = question.question;
+            
+            // Clear previous options
+            optionsContainer.innerHTML = '';
+            
+            // Add options
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('option');
+                optionElement.textContent = option;
+                optionElement.dataset.index = index;
+                optionElement.addEventListener('click', selectOption);
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // Update question number display
+            questionNumberDisplay.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+            
+            // Update progress bar
+            const progressPercentage = (currentQuestionIndex / questions.length) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            
+            // Reset selected option
+            selectedOptionIndex = null;
+            nextBtn.disabled = true;
+            nextBtn.style.opacity = '0.5';
+        }
+
+        // Handle option selection
+        function selectOption(e) {
+            // Clear previous selection
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Highlight selected option
+            e.target.classList.add('selected');
+            
+            // Store selected option index
+            selectedOptionIndex = parseInt(e.target.dataset.index);
+            
+            // Enable next button
+            nextBtn.disabled = false;
+            nextBtn.style.opacity = '1';
+        }
+
+        // Handle next question button click
+        function handleNextQuestion() {
+            if (selectedOptionIndex === null) {
+                return; // No option selected
+            }
+            
+            // Check answer
+            const currentQuestion = questions[currentQuestionIndex];
+            if (selectedOptionIndex === currentQuestion.answer) {
+                score++;
+            }
+            
+            // Move to next question
+            currentQuestionIndex++;
+            
+            // Check if quiz is complete
+            if (currentQuestionIndex >= questions.length) {
+                showResults();
+            } else {
+                loadQuestion();
+            }
+        }
+
+        // Show quiz results
+        function showResults() {
+            quizContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            
+            // Update score display
+            scoreDisplay.textContent = score;
+            certificateNameDisplay.textContent = userInfo.name;
+            certificateScoreDisplay.textContent = `${score}/${questions.length}`;
+            
+            // Set certificate date
+            const today = new Date();
+            certificateDateDisplay.textContent = today.toLocaleDateString();
+        }
+
+        // Restart the quiz
+        function restartQuiz() {
+            // Reset quiz state
+            currentQuestionIndex = 0;
+            score = 0;
+            selectedOptionIndex = null;
+            
+            // Hide results and show registration
+            resultsContainer.style.display = 'none';
+            registrationFormContainer.style.display = 'block';
+            
+            // Clear form
+            registrationForm.reset();
+        }
+    </script>
+</body>
+</html>
